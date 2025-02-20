@@ -7,10 +7,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
-import { regions } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
 
 export default function RegionDropdown() {
   const [, setLocation] = useLocation();
+
+  const { data: regions = [] } = useQuery<string[]>({
+    queryKey: ["/api/regions"],
+  });
 
   return (
     <DropdownMenu>

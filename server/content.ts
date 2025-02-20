@@ -7,22 +7,33 @@ import { type Article } from "@shared/schema";
 const md = new MarkdownIt();
 const contentDir = path.join(process.cwd(), "content");
 
+export function getAvailableRegions(): string[] {
+  if (!fs.existsSync(contentDir)) return [];
+  return fs.readdirSync(contentDir);
+}
+
+export function getAvailableCategories(region: string): string[] {
+  const regionPath = path.join(contentDir, region);
+  if (!fs.existsSync(regionPath)) return [];
+  return fs.readdirSync(regionPath);
+}
+
 export function getAllArticles(): Article[] {
   const articles: Article[] = [];
-  
+
   function processDirectory(dir: string) {
     const items = fs.readdirSync(dir);
-    
+
     for (const item of items) {
       const fullPath = path.join(dir, item);
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         processDirectory(fullPath);
       } else if (item.endsWith('.md')) {
         const fileContent = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(fileContent);
-        
+
         articles.push({
           id: articles.length + 1,
           title: data.title,
@@ -36,8 +47,10 @@ export function getAllArticles(): Article[] {
       }
     }
   }
-  
-  processDirectory(contentDir);
+
+  if (fs.existsSync(contentDir)) {
+    processDirectory(contentDir);
+  }
   return articles;
 }
 

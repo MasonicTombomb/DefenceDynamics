@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
-import { categories, Article } from "@shared/schema";
+import { Article } from "@shared/schema";
 import ArticleList from "@/components/articles/ArticleList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumb } from "@/types/article";
@@ -8,9 +8,13 @@ import { ChevronRight } from "lucide-react";
 
 export default function Region() {
   const { region = "" } = useParams();
-  
-  const { data: articles, isLoading } = useQuery<Article[]>({
+
+  const { data: articles, isLoading: articlesLoading } = useQuery<Article[]>({
     queryKey: [`/api/articles/region/${region}`],
+  });
+
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<string[]>({
+    queryKey: [`/api/regions/${region}/categories`],
   });
 
   const breadcrumbs: Breadcrumb[] = [
@@ -18,7 +22,7 @@ export default function Region() {
     { label: region, href: `/region/${region}` },
   ];
 
-  if (isLoading) return <div>Loading...</div>;
+  if (articlesLoading || categoriesLoading) return <div>Loading...</div>;
 
   return (
     <div className="container py-8">

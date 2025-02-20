@@ -2,8 +2,19 @@ import type { Express } from "express";
 import { createServer } from "http";
 import { storage } from "./storage";
 import { insertArticleSchema } from "@shared/schema";
+import { getAvailableRegions, getAvailableCategories } from "./content";
 
 export async function registerRoutes(app: Express) {
+  app.get("/api/regions", (_req, res) => {
+    const regions = getAvailableRegions();
+    res.json(regions);
+  });
+
+  app.get("/api/regions/:region/categories", (req, res) => {
+    const categories = getAvailableCategories(req.params.region);
+    res.json(categories);
+  });
+
   app.get("/api/articles", async (_req, res) => {
     const articles = await storage.getArticles();
     res.json(articles);

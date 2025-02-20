@@ -20,9 +20,3 @@ export const insertArticleSchema = createInsertSchema(articles).omit({
 
 export type InsertArticle = z.infer<typeof insertArticleSchema>;
 export type Article = typeof articles.$inferSelect;
-
-export const regions = ["Europe", "Russia", "Asia", "Americas", "Middle East"] as const;
-export const categories = ["Electronic Warfare", "Nuclear", "Air Power"] as const;
-
-export type Region = (typeof regions)[number];
-export type Category = (typeof categories)[number];
