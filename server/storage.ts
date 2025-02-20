@@ -1,4 +1,8 @@
-import { articles, type Article, type InsertArticle } from "@shared/schema";
+import { type Article, type InsertArticle } from "@shared/schema";
+import { getAllArticles, getArticle, getArticlesByRegion, getArticlesByRegionAndCategory } from "./content";
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 
 export interface IStorage {
   getArticles(): Promise<Article[]>;
@@ -8,85 +12,58 @@ export interface IStorage {
   createArticle(article: InsertArticle): Promise<Article>;
 }
 
-export class MemStorage implements IStorage {
-  private articles: Map<number, Article>;
-  private currentId: number;
-
-  constructor() {
-    this.articles = new Map();
-    this.currentId = 1;
-    this.seedData();
-  }
-
+export class FileStorage implements IStorage {
   async getArticles(): Promise<Article[]> {
-    return Array.from(this.articles.values());
+    return getAllArticles();
   }
 
   async getArticle(id: number): Promise<Article | undefined> {
-    return this.articles.get(id);
+    return getArticle(id);
   }
 
   async getArticlesByRegion(region: string): Promise<Article[]> {
-    return Array.from(this.articles.values()).filter(
-      (article) => article.region.toLowerCase() === region.toLowerCase()
-    );
+    return getArticlesByRegion(region);
   }
 
   async getArticlesByRegionAndCategory(region: string, category: string): Promise<Article[]> {
-    return Array.from(this.articles.values()).filter(
-      (article) => 
-        article.region.toLowerCase() === region.toLowerCase() &&
-        article.category.toLowerCase() === category.toLowerCase()
+    return getArticlesByRegionAndCategory(region, category);
+  }
+
+  async createArticle(article: InsertArticle): Promise<Article> {
+    const articlesDir = path.join(
+      process.cwd(),
+      "content",
+      article.region.toLowerCase(),
+      article.category.toLowerCase()
     );
-  }
 
-  async createArticle(insertArticle: InsertArticle): Promise<Article> {
-    const id = this.currentId++;
-    const article: Article = {
-      ...insertArticle,
-      id,
-      publishedAt: new Date(),
-    };
-    this.articles.set(id, article);
-    return article;
-  }
+    // Ensure directory exists
+    fs.mkdirSync(articlesDir, { recursive: true });
 
-  private seedData() {
-    const sampleArticles: InsertArticle[] = [
-      {
-        title: "New EW System Deployment in Eastern Europe",
-        content: `In a significant development for European electronic warfare capabilities, several NATO member states have announced the deployment of a new advanced electronic warfare system across Eastern Europe. This state-of-the-art system represents a major leap forward in defensive capabilities and strategic deterrence.
+    // Create a slug from the title
+    const slug = article.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
 
-The system, developed through multinational cooperation, incorporates cutting-edge signal processing technology and advanced machine learning algorithms to provide enhanced electromagnetic spectrum awareness and protection capabilities.
+    const filePath = path.join(articlesDir, `${slug}.md`);
 
-Key Features:
-- Advanced signal detection and analysis capabilities
-- Rapid response to emerging electromagnetic threats
-- Integration with existing NATO air defense networks
-- Mobile deployment capabilities for tactical flexibility
+    // Create frontmatter
+    const fileContent = matter.stringify(article.content, {
+      title: article.title,
+      summary: article.summary,
+      region: article.region,
+      category: article.category,
+      imageUrl: article.imageUrl,
+      publishedAt: new Date().toISOString(),
+    });
 
-Strategic Implications:
-The deployment of this system marks a significant shift in the region's electronic warfare capabilities, providing enhanced protection against various forms of electronic threats and improving overall situational awareness.
+    fs.writeFileSync(filePath, fileContent);
 
-Future Developments:
-Plans are already in place for further upgrades and expansions of the system, with additional deployments scheduled for the coming years. These developments will continue to strengthen European defense capabilities in the electromagnetic spectrum.`,
-        summary: "Latest developments in European EW systems showcase advanced capabilities and strategic implications",
-        region: "Europe",
-        category: "Electronic Warfare",
-        imageUrl: "https://placehold.co/1200x800",
-      },
-      {
-        title: "Russian Nuclear Doctrine Updates",
-        content: "Analysis of recent changes in Russian nuclear policy...",
-        summary: "Changes in Russian nuclear strategic thinking",
-        region: "Russia",
-        category: "Nuclear",
-        imageUrl: "https://placehold.co/600x400",
-      },
-    ];
-
-    sampleArticles.forEach((article) => this.createArticle(article));
+    // Return the newly created article
+    const articles = await this.getArticles();
+    return articles[articles.length - 1];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new FileStorage();
