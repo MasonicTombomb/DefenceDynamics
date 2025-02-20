@@ -8,7 +8,8 @@ const md = new MarkdownIt({
   html: false, // Disable HTML tags in the output
   breaks: true, // Convert '\n' in paragraphs into <br>
   linkify: true, // Autoconvert URL-like text to links
-});
+  typographer: true, // Enable some language-neutral replacement + quotes beautification
+}).disable(['image']); // Disable image rendering to prevent unwanted tags
 
 const contentDir = path.join(process.cwd(), "content");
 
@@ -46,10 +47,15 @@ export function getAllArticles(): Article[] {
         const fileContent = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(fileContent);
 
+        // Clean up the content by removing any HTML-like tags
+        const cleanContent = content
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/&[^;]+;/g, ''); // Remove HTML entities
+
         articles.push({
           id: id++,
           title: data.title,
-          content: md.render(content),
+          content: md.render(cleanContent),
           summary: data.summary,
           region: data.region,
           category: data.category,
