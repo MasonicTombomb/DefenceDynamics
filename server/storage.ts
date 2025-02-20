@@ -16,7 +16,24 @@ export interface IStorage {
 }
 
 export class FileStorage implements IStorage {
-  private timelineEvents: TimelineEvent[] = [];
+  private timelineEvents: TimelineEvent[] = [
+    {
+      id: 1,
+      title: "New Electronic Warfare System",
+      description: "Development of advanced electronic warfare capabilities announced",
+      date: new Date("2024-01-15"),
+      category: "Electronic Warfare",
+      articleId: 1
+    },
+    {
+      id: 2,
+      title: "Nuclear Doctrine Updates",
+      description: "Major updates to nuclear strategic policies revealed",
+      date: new Date("2024-01-10"),
+      category: "Nuclear",
+      articleId: 2
+    }
+  ];
   private nextEventId = 1;
 
   async getArticles(): Promise<Article[]> {
