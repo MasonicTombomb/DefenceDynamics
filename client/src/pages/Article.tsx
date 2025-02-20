@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default function ArticlePage() {
   const { id = "" } = useParams();
-  
+
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${id}`],
   });
@@ -70,9 +70,10 @@ export default function ArticlePage() {
           {article.summary}
         </div>
 
-        <div className="whitespace-pre-wrap">
-          {article.content}
-        </div>
+        <div 
+          className="article-content"
+          dangerouslySetInnerHTML={{ __html: article.content }}
+        />
       </article>
     </div>
   );
