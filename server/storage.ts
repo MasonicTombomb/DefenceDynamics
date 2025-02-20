@@ -32,6 +32,30 @@ export class FileStorage implements IStorage {
       date: new Date("2024-01-10"),
       category: "Nuclear",
       articleId: 2
+    },
+    {
+      id: 3,
+      title: "Air Defense System Upgrade",
+      description: "Next-generation air defense system successfully tested",
+      date: new Date("2024-01-20"),
+      category: "Air Power",
+      articleId: 1
+    },
+    {
+      id: 4,
+      title: "Hypersonic Missile Test",
+      description: "Successful test of new hypersonic missile system completed",
+      date: new Date("2024-01-25"),
+      category: "Nuclear",
+      articleId: 2
+    },
+    {
+      id: 5,
+      title: "Cyber Defense Initiative",
+      description: "Launch of new cyber defense program for critical infrastructure",
+      date: new Date("2024-01-30"),
+      category: "Electronic Warfare",
+      articleId: 1
     }
   ];
   private nextEventId = 1;
