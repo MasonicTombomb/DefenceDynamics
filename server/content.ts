@@ -4,7 +4,12 @@ import matter from "gray-matter";
 import MarkdownIt from "markdown-it";
 import { type Article } from "@shared/schema";
 
-const md = new MarkdownIt();
+const md = new MarkdownIt({
+  html: false, // Disable HTML tags in the output
+  breaks: true, // Convert '\n' in paragraphs into <br>
+  linkify: true, // Autoconvert URL-like text to links
+});
+
 const contentDir = path.join(process.cwd(), "content");
 
 export function getAvailableRegions(): string[] {

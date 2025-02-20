@@ -15,6 +15,26 @@ export default function Navbar() {
           </Button>
         </Link>
 
+        <NavigationMenu className="ml-6">
+          <NavigationMenuList className="gap-2">
+            <NavigationMenuItem>
+              <Link href="/articles">
+                <Button variant="ghost">Articles</Button>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/about">
+                <Button variant="ghost">About</Button>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/contact">
+                <Button variant="ghost">Contact</Button>
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+
         <NavigationMenu className="ml-auto">
           <NavigationMenuList>
             <NavigationMenuItem>
