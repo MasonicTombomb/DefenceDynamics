@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer } from "http";
 import { storage } from "./storage";
-import { insertArticleSchema } from "@shared/schema";
+import { insertArticleSchema, insertTimelineEventSchema } from "@shared/schema";
 import { getAvailableRegions, getAvailableCategories } from "./content";
 
 export async function registerRoutes(app: Express) {
@@ -52,6 +52,25 @@ export async function registerRoutes(app: Express) {
     }
     const article = await storage.createArticle(parsed.data);
     res.status(201).json(article);
+  });
+
+  app.get("/api/timeline-events", async (_req, res) => {
+    const events = await storage.getTimelineEvents();
+    res.json(events);
+  });
+
+  app.get("/api/timeline-categories", async (_req, res) => {
+    const categories = await storage.getTimelineCategories();
+    res.json(categories);
+  });
+
+  app.post("/api/timeline-events", async (req, res) => {
+    const parsed = insertTimelineEventSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error });
+    }
+    const event = await storage.createTimelineEvent(parsed.data);
+    res.status(201).json(event);
   });
 
   return createServer(app);

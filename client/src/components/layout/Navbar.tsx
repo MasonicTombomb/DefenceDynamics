@@ -23,6 +23,11 @@ export default function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
+              <Link href="/timeline">
+                <Button variant="ghost">Timeline</Button>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
               <Link href="/about">
                 <Button variant="ghost">About</Button>
               </Link>

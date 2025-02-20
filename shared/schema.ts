@@ -13,10 +13,25 @@ export const articles = pgTable("articles", {
   publishedAt: timestamp("published_at").defaultNow().notNull(),
 });
 
+export const timelineEvents = pgTable("timeline_events", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  date: timestamp("date").notNull(),
+  category: varchar("category", { length: 50 }).notNull(),
+  articleId: serial("article_id").references(() => articles.id),
+});
+
 export const insertArticleSchema = createInsertSchema(articles).omit({
   id: true,
   publishedAt: true,
 });
 
+export const insertTimelineEventSchema = createInsertSchema(timelineEvents).omit({
+  id: true,
+});
+
 export type InsertArticle = z.infer<typeof insertArticleSchema>;
 export type Article = typeof articles.$inferSelect;
+export type TimelineEvent = typeof timelineEvents.$inferSelect;
+export type InsertTimelineEvent = z.infer<typeof insertTimelineEventSchema>;

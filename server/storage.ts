@@ -1,4 +1,4 @@
-import { type Article, type InsertArticle } from "@shared/schema";
+import { type Article, type InsertArticle, type TimelineEvent, type InsertTimelineEvent } from "@shared/schema";
 import { getAllArticles, getArticle, getArticlesByRegion, getArticlesByRegionAndCategory } from "./content";
 import fs from "fs";
 import path from "path";
@@ -10,9 +10,15 @@ export interface IStorage {
   getArticlesByRegion(region: string): Promise<Article[]>;
   getArticlesByRegionAndCategory(region: string, category: string): Promise<Article[]>;
   createArticle(article: InsertArticle): Promise<Article>;
+  getTimelineEvents(): Promise<TimelineEvent[]>;
+  getTimelineCategories(): Promise<string[]>;
+  createTimelineEvent(event: InsertTimelineEvent): Promise<TimelineEvent>;
 }
 
 export class FileStorage implements IStorage {
+  private timelineEvents: TimelineEvent[] = [];
+  private nextEventId = 1;
+
   async getArticles(): Promise<Article[]> {
     return getAllArticles();
   }
@@ -37,10 +43,8 @@ export class FileStorage implements IStorage {
       article.category.toLowerCase()
     );
 
-    // Ensure directory exists
     fs.mkdirSync(articlesDir, { recursive: true });
 
-    // Create a slug from the title
     const slug = article.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -48,7 +52,6 @@ export class FileStorage implements IStorage {
 
     const filePath = path.join(articlesDir, `${slug}.md`);
 
-    // Create frontmatter
     const fileContent = matter.stringify(article.content, {
       title: article.title,
       summary: article.summary,
@@ -60,9 +63,26 @@ export class FileStorage implements IStorage {
 
     fs.writeFileSync(filePath, fileContent);
 
-    // Return the newly created article
     const articles = await this.getArticles();
     return articles[articles.length - 1];
+  }
+
+  async getTimelineEvents(): Promise<TimelineEvent[]> {
+    return this.timelineEvents;
+  }
+
+  async getTimelineCategories(): Promise<string[]> {
+    const categories = new Set(this.timelineEvents.map(event => event.category));
+    return Array.from(categories);
+  }
+
+  async createTimelineEvent(event: InsertTimelineEvent): Promise<TimelineEvent> {
+    const newEvent: TimelineEvent = {
+      ...event,
+      id: this.nextEventId++,
+    };
+    this.timelineEvents.push(newEvent);
+    return newEvent;
   }
 }
 
