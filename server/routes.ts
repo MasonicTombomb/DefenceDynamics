@@ -9,6 +9,18 @@ export async function registerRoutes(app: Express) {
     res.json(articles);
   });
 
+  app.get("/api/articles/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid article ID" });
+    }
+    const article = await storage.getArticle(id);
+    if (!article) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+    res.json(article);
+  });
+
   app.get("/api/articles/region/:region", async (req, res) => {
     const articles = await storage.getArticlesByRegion(req.params.region);
     res.json(articles);
