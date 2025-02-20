@@ -19,6 +19,23 @@ export class FileStorage implements IStorage {
   private timelineEvents: TimelineEvent[] = [];
   private nextEventId = 1;
 
+  constructor() {
+    this.initializeTimelineEvents();
+  }
+
+  private initializeTimelineEvents() {
+    const articles = getAllArticles();
+    this.timelineEvents = articles.map(article => ({
+      id: article.id,
+      title: article.title,
+      description: article.summary,
+      date: article.publishedAt,
+      category: article.category,
+      articleId: article.id
+    }));
+    this.nextEventId = articles.length + 1;
+  }
+
   async getArticles(): Promise<Article[]> {
     return getAllArticles();
   }
