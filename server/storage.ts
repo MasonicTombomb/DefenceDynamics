@@ -58,7 +58,7 @@ export class FileStorage implements IStorage {
       articleId: 1
     }
   ];
-  private nextEventId = 1;
+  private nextEventId = 6;
 
   async getArticles(): Promise<Article[]> {
     return getAllArticles();
