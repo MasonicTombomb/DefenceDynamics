@@ -9,17 +9,24 @@ const contentDir = path.join(process.cwd(), "content");
 
 export function getAvailableRegions(): string[] {
   if (!fs.existsSync(contentDir)) return [];
-  return fs.readdirSync(contentDir);
+  return fs.readdirSync(contentDir).map(region => 
+    region.charAt(0).toUpperCase() + region.slice(1)
+  );
 }
 
 export function getAvailableCategories(region: string): string[] {
-  const regionPath = path.join(contentDir, region);
+  const regionPath = path.join(contentDir, region.toLowerCase());
   if (!fs.existsSync(regionPath)) return [];
-  return fs.readdirSync(regionPath);
+  return fs.readdirSync(regionPath).map(category => 
+    category.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ')
+  );
 }
 
 export function getAllArticles(): Article[] {
   const articles: Article[] = [];
+  let id = 1;
 
   function processDirectory(dir: string) {
     const items = fs.readdirSync(dir);
@@ -35,7 +42,7 @@ export function getAllArticles(): Article[] {
         const { data, content } = matter(fileContent);
 
         articles.push({
-          id: articles.length + 1,
+          id: id++,
           title: data.title,
           content: md.render(content),
           summary: data.summary,
