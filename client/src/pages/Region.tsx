@@ -52,7 +52,7 @@ export default function Region() {
           <TabsContent key={category} value={category}>
             <ArticleList
               articles={
-                articles?.filter((a) => a.category === category) ?? []
+                  articles?.filter((a) => a.categories?.includes(category) || a.category === category) ?? []
               }
             />
           </TabsContent>

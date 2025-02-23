@@ -26,7 +26,8 @@ export default function ArticlePage() {
   const breadcrumbs: Breadcrumb[] = [
     { label: "Home", href: "/" },
     { label: article.region, href: `/region/${article.region.toLowerCase()}` },
-    { label: article.category, href: `/region/${article.region.toLowerCase()}/category/${article.category.toLowerCase()}` },
+    { label: Array.isArray(article.categories) ? article.categories[0] : article.category,
+      href: `/region/${article.region.toLowerCase()}/category/${(Array.isArray(article.categories) ? article.categories[0] : article.category).toLowerCase()}` },
     { label: "Article", href: `/article/${id}` },
   ];
 
@@ -49,7 +50,12 @@ export default function ArticlePage() {
       <article className="prose prose-invert mx-auto">
         <div className="flex gap-2 mb-4">
           <Badge>{article.region}</Badge>
-          <Badge variant="outline">{article.category}</Badge>
+          {Array.isArray(article.categories)
+              ? article.categories.map((cat) => (
+                  <Badge key={cat} variant="outline">{cat}</Badge>
+              ))
+              : <Badge variant="outline">{article.category}</Badge>
+          }
         </div>
 
         <h1 className="mb-4">{article.title}</h1>

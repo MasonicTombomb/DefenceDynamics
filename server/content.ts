@@ -7,19 +7,26 @@ const contentDir = path.join(process.cwd(), "content");
 
 export function getAvailableRegions(): string[] {
   if (!fs.existsSync(contentDir)) return [];
-  return fs.readdirSync(contentDir).map(region => 
-    region.charAt(0).toUpperCase() + region.slice(1)
+  return fs.readdirSync(contentDir).map(region =>
+      region.charAt(0).toUpperCase() + region.slice(1)
   );
 }
 
 export function getAvailableCategories(region: string): string[] {
-  const regionPath = path.join(contentDir, region.toLowerCase());
-  if (!fs.existsSync(regionPath)) return [];
-  return fs.readdirSync(regionPath).map(category => 
-    category.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ')
-  );
+  const articles = getAllArticles();
+  const categorySet = new Set<string>();
+
+  articles
+      .filter(article => article.region.toLowerCase() === region.toLowerCase())
+      .forEach(article => {
+        if (Array.isArray(article.categories)) {
+          article.categories.forEach(category => categorySet.add(category));
+        } else if (article.category) {
+          categorySet.add(article.category);
+        }
+      });
+
+  return Array.from(categorySet);
 }
 
 export function getAllArticles(): Article[] {
@@ -39,13 +46,15 @@ export function getAllArticles(): Article[] {
         const fileContent = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(fileContent);
 
+        const categories = Array.isArray(data.category) ? data.category : [data.category];
         articles.push({
           id: id++,
           title: data.title,
-          content: content, // Use content directly without markdown processing
+          content: content,
           summary: data.summary,
           region: data.region,
-          category: data.category,
+          category: categories[0],
+          categories: categories,
           imageUrl: data.imageUrl,
           publishedAt: new Date(data.publishedAt),
         });
@@ -65,14 +74,16 @@ export function getArticle(id: number): Article | undefined {
 
 export function getArticlesByRegion(region: string): Article[] {
   return getAllArticles().filter(
-    article => article.region.toLowerCase() === region.toLowerCase()
+      article => article.region.toLowerCase() === region.toLowerCase()
   );
 }
 
 export function getArticlesByRegionAndCategory(region: string, category: string): Article[] {
-  return getAllArticles().filter(
-    article => 
-      article.region.toLowerCase() === region.toLowerCase() &&
-      article.category.toLowerCase() === category.toLowerCase()
-  );
+  return getAllArticles().filter(article => {
+    const regionMatch = article.region.toLowerCase() === region.toLowerCase();
+    const categoryMatch = Array.isArray(article.categories)
+        ? article.categories.includes(category)
+        : article.category === category;
+    return regionMatch && categoryMatch;
+  });
 }

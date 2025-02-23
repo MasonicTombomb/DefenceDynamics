@@ -22,7 +22,12 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
             <Badge>{article.region}</Badge>
-            <Badge variant="outline">{article.category}</Badge>
+            {Array.isArray(article.categories)
+                ? article.categories.map((cat) => (
+                    <Badge key={cat} variant="outline">{cat}</Badge>
+                ))
+                : <Badge variant="outline">{article.category}</Badge>
+            }
           </div>
           <CardTitle className="line-clamp-2">{article.title}</CardTitle>
         </CardHeader>

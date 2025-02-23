@@ -38,11 +38,12 @@ export async function registerRoutes(app: Express) {
   });
 
   app.get("/api/articles/region/:region/category/:category", async (req, res) => {
-    const articles = await storage.getArticlesByRegionAndCategory(
-      req.params.region,
-      req.params.category
+    const articles = await storage.getArticles();
+    const filteredArticles = articles.filter(article =>
+        article.region.toLowerCase() === req.params.region.toLowerCase() &&
+        (article.categories?.includes(req.params.category) || article.category === req.params.category)
     );
-    res.json(articles);
+    res.json(filteredArticles);
   });
 
   app.post("/api/articles", async (req, res) => {

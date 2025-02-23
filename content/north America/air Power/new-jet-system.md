@@ -1,8 +1,8 @@
 ---
-title: "New EW System Deployment in Eastern Europe"
-summary: "Latest developments in European EW systems showcase advanced capabilities and strategic implications"
-region: "Europe"
-category: ["Electronic Warfare", "Ukraine"]
+title: "New Jet System Deployment in USA"
+summary: "Latest developments in US Jet systems showcase advanced capabilities and strategic implications"
+region: "North America"
+category: "Air Power"
 imageUrl: "https://placehold.co/1200x800"
 publishedAt: "2025-02-20T12:00:00Z"
 ---

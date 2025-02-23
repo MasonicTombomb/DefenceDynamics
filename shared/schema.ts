@@ -8,7 +8,7 @@ export const articles = pgTable("articles", {
   content: text("content").notNull(),
   summary: text("summary").notNull(),
   region: varchar("region", { length: 50 }).notNull(),
-  category: varchar("category", { length: 50 }).notNull(),
+  categories: text("categories").array().notNull(),
   imageUrl: text("image_url").notNull(),
   publishedAt: timestamp("published_at").defaultNow().notNull(),
 });
@@ -18,7 +18,7 @@ export const timelineEvents = pgTable("timeline_events", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   date: timestamp("date").notNull(),
-  category: varchar("category", { length: 50 }).notNull(),
+  categories: text("categories").array().notNull(),
   articleId: serial("article_id").references(() => articles.id),
 });
 

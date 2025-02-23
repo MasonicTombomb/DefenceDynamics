@@ -49,23 +49,28 @@ export class FileStorage implements IStorage {
   }
 
   async getArticlesByRegionAndCategory(region: string, category: string): Promise<Article[]> {
-    return getArticlesByRegionAndCategory(region, category);
+    const articles = await this.getArticles();
+    return articles.filter(article =>
+        article.region.toLowerCase() === region.toLowerCase() &&
+        (article.categories?.includes(category) || article.category === category)
+    );
   }
 
   async createArticle(article: InsertArticle): Promise<Article> {
+    const category = Array.isArray(article.category) ? article.category[0] : article.category;
     const articlesDir = path.join(
-      process.cwd(),
-      "content",
-      article.region.toLowerCase(),
-      article.category.toLowerCase()
+        process.cwd(),
+        "content",
+        article.region.toLowerCase(),
+        category.toLowerCase()
     );
 
     fs.mkdirSync(articlesDir, { recursive: true });
 
     const slug = article.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
 
     const filePath = path.join(articlesDir, `${slug}.md`);
 
